@@ -168,14 +168,14 @@ $model_irasas = new App\model\ModelIrasas('kokteiliai', $db);
         <title>Remontas</title>
     </head>
     <body>
-        <?php foreach ($model_irasas->loadAll() as $irasas): ?>
-            <div>
-                <p>Skyrius: <?php print $irasas->getSkyrius(); ?></p>
-                <p>Valstybinis nr.: <?php print $irasas->getValstNr(); ?></p>
-            <?php endforeach; ?>
-        </div>
         <div>
             <?php require ROOT_DIR . '/core/views/form.php'; ?>
+        </div>
+        <?php foreach ($model_irasas->loadAll() as $irasas): ?>
+            <div>
+                <p>Dok Suma: <?php print $irasas->getDokSuma(); ?></p>
+                <p>Valstybinis nr.: <?php print $irasas->getValstNr(); ?></p>
+            <?php endforeach; ?>
         </div>
     </body>
 </html>
