@@ -169,7 +169,9 @@ $connection = new Core\Database\Connection([
     'password' => 'JB4BZEm0'
         ]);
 
-$connection->connect();
+$pdo = $connection->getPDO();
+$pdo->exec("INSERT INTO `mydb`.`users` (`email`, `surname`)
+VALUES('php mailas', 'balaboskinas')");
 ?>
 <html>
     <head>
