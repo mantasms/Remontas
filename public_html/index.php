@@ -170,8 +170,14 @@ $connection = new Core\Database\Connection([
         ]);
 
 $pdo = $connection->getPDO();
-$pdo->exec("INSERT INTO `mydb`.`users` (`email`, `surname`)
-VALUES('php mailas', 'balaboskinas')");
+$pdo->exec("INSERT INTO `mydb`.`remontas` (`skyrius`, `valst_nr`, `marke`)
+VALUES('php mailas', 'balaboskinas', 'BHZ681')");
+
+//$pdo->prepare("INSERT INTO `mydb`.`users` " . "(name, pass, mail)
+//VALUES(:name, :pass, :mail)");
+//
+//$query->bindParam(':name', '')
+
 ?>
 <html>
     <head>
