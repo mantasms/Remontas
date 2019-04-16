@@ -162,6 +162,14 @@ $model_irasas = new App\model\ModelIrasas('kokteiliai', $db);
 //$model_irasas->insert('vodke', $vodke);
 //$model_irasas->insert('ginas', $ginas);
 //$model_irasas->insert('likeris', $likeris);
+
+$connection = new Core\Database\Connection([
+    'host' => 'localhost',
+    'user' => 'root',
+    'password' => 'JB4BZEm0'
+        ]);
+
+$connection->connect();
 ?>
 <html>
     <head>
@@ -173,7 +181,7 @@ $model_irasas = new App\model\ModelIrasas('kokteiliai', $db);
         </div>
         <?php foreach ($model_irasas->loadAll() as $irasas): ?>
             <div>
-                <p>Dok Suma: <?php print $irasas->getDokSuma(); ?></p>
+                <p>Dok Suma: <?php print $irasas->getDokSuma(); ?> Valstybinis nr.: <?php print $irasas->getValstNr(); ?></p>
                 <p>Valstybinis nr.: <?php print $irasas->getValstNr(); ?></p>
             <?php endforeach; ?>
         </div>
