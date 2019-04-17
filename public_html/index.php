@@ -219,8 +219,8 @@ $data = $query->fetchAll(PDO::FETCH_ASSOC);
             <?php require ROOT_DIR . '/core/views/form.php'; ?>
         </div>
         <?php foreach ($data as $row): ?>
-            <?php foreach ($row as $field): ?>
-                <div><?php print $field; ?></div>
+            <table><?php foreach ($row as $field): ?></table><br>
+                <span><?php print $field; ?></span>
             <?php endforeach; ?>
         <?php endforeach; ?>
     </body>
