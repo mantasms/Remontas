@@ -170,14 +170,45 @@ $connection = new Core\Database\Connection([
         ]);
 
 $pdo = $connection->getPDO();
-$pdo->exec("INSERT INTO `mydb`.`remontas` (`skyrius`, `valst_nr`, `marke`)
-VALUES('php mailas', 'balaboskinas', 'BHZ681')");
+//$pdo->exec("INSERT INTO `mydb`.`remontas` (`skyrius`, `valst_nr`, `marke`)
+//VALUES('php mailas', 'balaboskinas', 'BHZ681')");
 
-//$pdo->prepare("INSERT INTO `mydb`.`users` " . "(name, pass, mail)
-//VALUES(:name, :pass, :mail)");
-//
-//$query->bindParam(':name', '')
+$query = $pdo->prepare('INSERT INTO `mydb`.`remontas` ' .
+        '(skyrius, valst_nr, priemones_tipas, marke, pagaminimo_metai, dok_nr, dok_data, tiekejas, detale_darbas, vnt_kaina, dok_suma)
+VALUES(:skyrius, :valst_nr, :priemones_tipas, :marke, :pagaminimo_metai, :dok_nr, :dok_data, :tiekejas, :detale_darbas, :vnt_kaina, :dok_suma)');
 
+$data = [
+    'skyrius' => 'tarptautiniai',
+    'valst_nr' => 'ACZ555',
+    'priemones_tipas' => 'vilkikas',
+    'marke' => 'MB',
+    'pagaminimo_metai' => '2001',
+    'dok_nr' => '1234',
+    'dok_data' => 'dok_data',
+    'tiekejas' => 'Petro imone',
+    'detale_darbas' => 'padangos',
+    'vnt_kaina' => '999.99',
+    'dok_suma' => '2000'
+];
+
+$query->bindParam(':skyrius', $data['skyrius'], PDO::PARAM_STR);
+$query->bindParam(':valst_nr', $data['valst_nr'], PDO::PARAM_STR);
+$query->bindParam(':priemones_tipas', $data['priemones_tipas'], PDO::PARAM_STR);
+$query->bindParam(':marke', $data['marke'], PDO::PARAM_STR);
+$query->bindParam(':pagaminimo_metai', $data['pagaminimo_metai'], PDO::PARAM_STR);
+$query->bindParam(':dok_nr', $data['dok_nr'], PDO::PARAM_STR);
+$query->bindParam(':dok_data', $data['dok_data'], PDO::PARAM_STR);
+$query->bindParam(':tiekejas', $data['tiekejas'], PDO::PARAM_STR);
+$query->bindParam(':detale_darbas', $data['detale_darbas'], PDO::PARAM_STR);
+$query->bindParam(':vnt_kaina', $data['vnt_kaina'], PDO::PARAM_STR);
+$query->bindParam(':dok_suma', $data['dok_suma'], PDO::PARAM_STR);
+
+$query->execute();
+
+$query = $pdo->query('SELECT * FROM `mydb` . `remontas`');
+$data = $query->fetchAll(PDO::FETCH_ASSOC);
+
+//var_dump($data);
 ?>
 <html>
     <head>
@@ -187,11 +218,10 @@ VALUES('php mailas', 'balaboskinas', 'BHZ681')");
         <div>
             <?php require ROOT_DIR . '/core/views/form.php'; ?>
         </div>
-        <?php foreach ($model_irasas->loadAll() as $irasas): ?>
-            <div>
-                <p>Dok Suma: <?php print $irasas->getDokSuma(); ?> Valstybinis nr.: <?php print $irasas->getValstNr(); ?></p>
-                <p>Valstybinis nr.: <?php print $irasas->getValstNr(); ?></p>
+        <?php foreach ($data as $row): ?>
+            <?php foreach ($row as $field): ?>
+                <div><?php print $field; ?></div>
             <?php endforeach; ?>
-        </div>
+        <?php endforeach; ?>
     </body>
 </html>
