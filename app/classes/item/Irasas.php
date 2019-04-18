@@ -5,6 +5,10 @@ namespace App\Item;
 Class Irasas {
 
     private $data;
+    
+    const SKYRIUS_TARPTAUTINIIAI = 1;
+    const SKYRIUS_VIETINIAI = 2;
+    const SKYRIUS_KOMERCINIAI = 3;
 
     public function __construct($data = null) {
         if ($data) {
@@ -24,6 +28,14 @@ Class Irasas {
                 'dok_suma' => null,
             ];
         }
+    }
+    
+    public static function getSkyriusOptions() {
+        return [
+            self::SKYRIUS_TARPTAUTINIIAI => 'Tarptautiniai',
+            self::SKYRIUS_VIETINIAI => 'Vietiniai',
+            self::SKYRIUS_KOMERCINIAI => 'Komerciniai'
+        ];
     }
 
     public function setSkyrius(string $skyrius) {

@@ -1,19 +1,15 @@
 <?php
 require '../bootloader.php';
+
+use Core\Database\SQLBuilder;
+
 $form = [
     'fields' => [
         'skyrius' => [
             'name' => 'skyrius',
             'label' => '',
             'type' => 'select',
-            'options' => [
-                'tarptautiniai',
-                'vietiniai',
-                'mokykla',
-                'lengvieji',
-                'rezervas',
-                'bendros'
-            ],
+            'options' => \App\Item\Irasas::getSkyriusOptions(),
             'placeholder' => 'skyrius',
             'validate' => [
                 'validate_not_empty',
@@ -131,10 +127,22 @@ $form = [
     ]
 ];
 
+$connection = new Core\Database\Connection([
+    'host' => 'localhost',
+    'user' => 'root',
+    'password' => 'JB4BZEm0'
+        ]);
+
+$pdo = $connection->getPDO();
+
 function form_success($safe_input, $form) {
-    $db = new Core\FileDB(ROOT_DIR . '/app/files/db.txt');
-    $model_irasas = new App\model\ModelIrasas('kokteiliai', $db);
-    $irasas = new \App\Item\Irasas([
+    $connection = new Core\Database\Connection([
+        'host' => 'localhost',
+        'user' => 'root',
+        'password' => 'JB4BZEm0'
+    ]);
+
+    $data = [
         'skyrius' => $safe_input['skyrius'],
         'valst_nr' => $safe_input['valst_nr'],
         'priemones_tipas' => $safe_input['priemones_tipas'],
@@ -145,10 +153,27 @@ function form_success($safe_input, $form) {
         'tiekejas' => $safe_input['tiekejas'],
         'detale_darbas' => $safe_input['detale_darbas'],
         'vnt_kaina' => $safe_input['vnt_kaina'],
-        'dok_suma' => $safe_input['dok_suma'],
+        'dok_suma' => $safe_input['dok_suma']
+    ];
+
+    $columns = array_keys($data);
+
+    $pdo = $connection->getPDO();
+    $sql = strtr('INSERT INTO @db.@table ' .
+                    '(@columns) VALUES (@values)', [
+        '@db' => SQLBuilder::schema('mydb'),
+        '@table' => SQLBuilder::table('remontas'),
+        '@columns' => SQLBuilder::columns($columns),
+        '@values' => SQLBuilder::binds($columns)
     ]);
-    $id = time() . '_' . rand(0, 10000);
-    $model_irasas->insert($id, $irasas);
+    var_dump($sql);
+    $query = $pdo->prepare($sql);
+
+    foreach ($data as $column => $value) {
+        $query->bindValue(SQLBuilder::bind($column), $value);
+    }
+
+    $query->execute();
 }
 
 if (!empty($_POST)) {
@@ -156,59 +181,9 @@ if (!empty($_POST)) {
     $success = validate_form($safe_input, $form);
 }
 
-$db = new Core\FileDB(ROOT_DIR . '/app/files/db.txt');
-$model_irasas = new App\model\ModelIrasas('kokteiliai', $db);
-//$model_irasas->insert('viskis', $viskis);
-//$model_irasas->insert('vodke', $vodke);
-//$model_irasas->insert('ginas', $ginas);
-//$model_irasas->insert('likeris', $likeris);
-
-$connection = new Core\Database\Connection([
-    'host' => 'localhost',
-    'user' => 'root',
-    'password' => 'JB4BZEm0'
-        ]);
-
-$pdo = $connection->getPDO();
-//$pdo->exec("INSERT INTO `mydb`.`remontas` (`skyrius`, `valst_nr`, `marke`)
-//VALUES('php mailas', 'balaboskinas', 'BHZ681')");
-
-$query = $pdo->prepare('INSERT INTO `mydb`.`remontas` ' .
-        '(skyrius, valst_nr, priemones_tipas, marke, pagaminimo_metai, dok_nr, dok_data, tiekejas, detale_darbas, vnt_kaina, dok_suma)
-VALUES(:skyrius, :valst_nr, :priemones_tipas, :marke, :pagaminimo_metai, :dok_nr, :dok_data, :tiekejas, :detale_darbas, :vnt_kaina, :dok_suma)');
-
-$data = [
-    'skyrius' => 'tarptautiniai',
-    'valst_nr' => 'ACZ555',
-    'priemones_tipas' => 'vilkikas',
-    'marke' => 'MB',
-    'pagaminimo_metai' => '2001',
-    'dok_nr' => '1234',
-    'dok_data' => 'dok_data',
-    'tiekejas' => 'Petro imone',
-    'detale_darbas' => 'padangos',
-    'vnt_kaina' => '999.99',
-    'dok_suma' => '2000'
-];
-
-$query->bindParam(':skyrius', $data['skyrius'], PDO::PARAM_STR);
-$query->bindParam(':valst_nr', $data['valst_nr'], PDO::PARAM_STR);
-$query->bindParam(':priemones_tipas', $data['priemones_tipas'], PDO::PARAM_STR);
-$query->bindParam(':marke', $data['marke'], PDO::PARAM_STR);
-$query->bindParam(':pagaminimo_metai', $data['pagaminimo_metai'], PDO::PARAM_STR);
-$query->bindParam(':dok_nr', $data['dok_nr'], PDO::PARAM_STR);
-$query->bindParam(':dok_data', $data['dok_data'], PDO::PARAM_STR);
-$query->bindParam(':tiekejas', $data['tiekejas'], PDO::PARAM_STR);
-$query->bindParam(':detale_darbas', $data['detale_darbas'], PDO::PARAM_STR);
-$query->bindParam(':vnt_kaina', $data['vnt_kaina'], PDO::PARAM_STR);
-$query->bindParam(':dok_suma', $data['dok_suma'], PDO::PARAM_STR);
-
-$query->execute();
 
 $query = $pdo->query('SELECT * FROM `mydb` . `remontas`');
 $data = $query->fetchAll(PDO::FETCH_ASSOC);
-
-//var_dump($data);
 ?>
 <html>
     <head>
@@ -218,10 +193,15 @@ $data = $query->fetchAll(PDO::FETCH_ASSOC);
         <div>
             <?php require ROOT_DIR . '/core/views/form.php'; ?>
         </div>
-        <?php foreach ($data as $row): ?>
-            <table><?php foreach ($row as $field): ?></table><br>
-                <span><?php print $field; ?></span>
+        <table>
+            <?php foreach ($data as $row): ?>
+                <tr>
+                    <td><?php print \App\Item\Irasas::getSkyriusOptions()[$row['skyrius']]; ?></td>                    
+                    <?php foreach ($row as $column): ?>
+                        <td><?php print $column; ?></td>
+                    <?php endforeach; ?>
+                </tr>
             <?php endforeach; ?>
-        <?php endforeach; ?>
+        </table>
     </body>
 </html>
